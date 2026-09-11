@@ -27,6 +27,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Upload executable JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: demo-ci-cd-jar
