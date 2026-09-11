@@ -33,6 +33,17 @@ jobs:
           echo "Java version: $JAVA_VERSION"
           java -version
 
+      - name: Verify secret configuration
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+        run: |
+          if [ -n "$DEMO_SECRET" ]; then
+            echo "Secret is configured"
+          else
+            echo "Secret is missing"
+            exit 1
+          fi
+
       - name: Build and test
         run: ./gradlew clean build
 
