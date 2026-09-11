@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  APP_NAME: demo-ci-cd
+  JAVA_VERSION: '17'
+
 on:
   push:
     branches:
@@ -22,6 +26,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Display environment information
+        run: |
+          echo "Application: $APP_NAME"
+          echo "Java version: $JAVA_VERSION"
+          java -version
 
       - name: Build and test
         run: ./gradlew clean build
