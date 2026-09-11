@@ -21,3 +21,9 @@ jobs:
 
       - name: Build and test
         run: ./gradlew clean build
+
+      - name: Upload executable JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-ci-cd-jar
+          path: build/libs/*.jar
