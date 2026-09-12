@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  APP_NAME: demo-ci-cd
+  JAVA_VERSION: '17'
+
 on:
   push:
     branches:
@@ -23,10 +27,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        
+      - name: Display environment information
+        run: |
+          echo "Application: $APP_NAME"
+          echo "Java version: $JAVA_VERSION"
+          java -version
+
+      - name: Verify secret configuration
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+        run: |
+          if [ -n "$DEMO_SECRET" ]; then
+            echo "Secret is configured"
+          else
+            echo "Secret is missing"
+            exit 1
+          fi
+
+
       - name: Build and test
         run: ./gradlew clean build
 
       - name: Upload executable JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: demo-ci-cd-jar
