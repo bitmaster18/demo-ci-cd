@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: demo-ci-cd-jar
-          path: build/libs/*.jar
+          path: build/libs/demo-ci-cd-0.0.1-SNAPSHOT.jar
 
   verify-artifact:
     needs: build
