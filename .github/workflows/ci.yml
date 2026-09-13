@@ -83,6 +83,11 @@ jobs:
       fail-fast: false
       matrix:
         java: ['17', '21']
+        include:
+          - java: '17'
+            label: 'Supported baseline'
+          - java: '21'
+            label: 'Compatibility check'
 
     steps:
       - name: Checkout code
@@ -93,6 +98,11 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+
+      - name: Display test configuration
+        run: |
+          echo "Java version: ${{ matrix.java }}"
+          echo "Test type: ${{ matrix.label }}"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
