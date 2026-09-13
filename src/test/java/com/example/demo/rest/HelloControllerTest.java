@@ -10,8 +10,7 @@ class HelloControllerTest {
     void hello_shouldReturnExpectedMessage() {
         HelloController controller = new HelloController();
         String response = controller.hello();
-//        assertEquals("Hello from CI/CD Demo!", response);
-        assertEquals("Wrong Message!", response);
+        assertEquals("Hello from CI/CD Demo!", response);
     }
 
 }
