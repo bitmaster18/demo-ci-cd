@@ -26,6 +26,9 @@ on:
       - '.github/workflows/**'
 
   workflow_dispatch:
+  
+permissions:
+  contents: read
 
 env:
   APP_NAME: demo-ci-cd
