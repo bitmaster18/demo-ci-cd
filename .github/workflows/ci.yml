@@ -9,6 +9,8 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 env:
   APP_NAME: demo-ci-cd
   JAVA_VERSION: '17'
