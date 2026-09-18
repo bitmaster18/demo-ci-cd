@@ -77,6 +77,7 @@ jobs:
         with:
           name: demo-ci-cd-jar
           path: build/libs/demo-ci-cd-0.0.1-SNAPSHOT.jar
+          retention-days: 7
 
   test:
     needs: build
