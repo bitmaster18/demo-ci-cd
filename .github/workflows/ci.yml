@@ -26,6 +26,9 @@ on:
       - '.github/workflows/**'
 
   workflow_dispatch:
+  
+permissions:
+  contents: read
 
 env:
   APP_NAME: demo-ci-cd
@@ -74,10 +77,21 @@ jobs:
         with:
           name: demo-ci-cd-jar
           path: build/libs/demo-ci-cd-0.0.1-SNAPSHOT.jar
+          retention-days: 7
 
   test:
     needs: build
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '21']
+        include:
+          - java: '17'
+            label: 'Supported baseline'
+          - java: '21'
+            label: 'Compatibility check'
 
     steps:
       - name: Checkout code
@@ -86,8 +100,13 @@ jobs:
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
+
+      - name: Display test configuration
+        run: |
+          echo "Java version: ${{ matrix.java }}"
+          echo "Test type: ${{ matrix.label }}"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
