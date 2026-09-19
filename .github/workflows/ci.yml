@@ -148,7 +148,7 @@ jobs:
       - name: Download executable JAR
         uses: actions/download-artifact@v4
         with:
-          name: executable-jar
+          name: demo-ci-cd-jar
           path: build/libs
 
       - name: Build Docker image
