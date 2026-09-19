@@ -136,3 +136,20 @@ jobs:
 
       - name: List downloaded files
         run: ls -la downloaded-artifact
+
+  docker:
+    needs: verify-artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download executable JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: executable-jar
+          path: build/libs
+
+      - name: Build Docker image
+        run: docker build -t demo-ci-cd:${{ github.sha }} .
