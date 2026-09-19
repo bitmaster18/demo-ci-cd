@@ -136,3 +136,39 @@ jobs:
 
       - name: List downloaded files
         run: ls -la downloaded-artifact
+
+  docker:
+    needs: verify-artifact
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download executable JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-ci-cd-jar
+          path: build/libs
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/demo-ci-cd
+          docker build -t "$IMAGE_NAME:${{ github.sha }}" .
+
+      - name: Push Docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/demo-ci-cd
+          docker push "$IMAGE_NAME:${{ github.sha }}"
