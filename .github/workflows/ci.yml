@@ -162,13 +162,62 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Build Docker image
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/demo-ci-cd
-          docker build -t "$IMAGE_NAME:${{ github.sha }}" .
+          IMAGE_TAG=${{ github.sha }}
+
+          docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+      
+      - name: Start test container
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/demo-ci-cd
+          IMAGE_TAG=${{ github.sha }}
+
+          docker run -d \
+            --name demo-ci-cd-test \
+            -p 8080:8080 \
+            "$IMAGE_NAME:$IMAGE_TAG"
+
+      - name: Wait for container health
+        run: |
+          for i in {1..30}; do
+            STATUS=$(docker inspect \
+              --format='{{.State.Health.Status}}' \
+              demo-ci-cd-test)
+
+            echo "Container health: $STATUS"
+
+            if [ "$STATUS" = "healthy" ]; then
+              exit 0
+            fi
+
+            if [ "$STATUS" = "unhealthy" ]; then
+              echo "Container became unhealthy"
+              docker logs demo-ci-cd-test
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          echo "Container did not become healthy within the expected time"
+          docker logs demo-ci-cd-test
+          exit 1
+
+      - name: Verify application endpoint
+        run: |
+          curl --fail http://localhost:8080/api/hello
+
+      - name: Remove test container
+        if: always()
+        run: docker rm -f demo-ci-cd-test
 
       - name: Push Docker image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/demo-ci-cd
-          docker push "$IMAGE_NAME:${{ github.sha }}"
+          IMAGE_TAG=${{ github.sha }}
+
+          docker push "$IMAGE_NAME:$IMAGE_TAG"
