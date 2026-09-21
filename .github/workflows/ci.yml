@@ -208,7 +208,7 @@ jobs:
 
       - name: Verify application endpoint
         run: |
-          curl --fail http://localhost:8080/api/hello
+          curl --fail http://localhost:8080/actuator/not-found
 
       - name: Remove test container
         if: always()
